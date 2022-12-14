@@ -3,12 +3,12 @@ class Composite(object):
 
     __fileSystemcomponents = []
     _nodes = []
-    _type = ""
+    type = ""
     name = ""
     path = ""
 
     def __init__(self, type):
-        self._type = type
+        self.type = type
         self._nodes = []
 
     def addSystemComponent(self, component):
@@ -25,6 +25,14 @@ class Composite(object):
 
     def removeFileSystemComponent(self, component):
         self.__fileSystemcomponents.remove(component)
+        if(component.type=="dir"):
+            parts= component.getListOfComponents()
+            for p in parts:
+                self.delete(p)
+        self.delete(component)
+    
+    def delete(self, component):
+        self._nodes.remove(component)
 
     def findComponent(self, name):
         for component in self._nodes:
@@ -43,13 +51,13 @@ class Composite(object):
 class Directory(object):
 
     _nodes = []
-    _type = ""
+    type = ""
     name = ""
     path = ""
     max_num = 5
 
     def __init__(self, type):
-        self._type = type
+        self.type = type
         self._nodes = []
 
     def create(self, name, path):
@@ -87,24 +95,25 @@ class Directory(object):
     def getListOfComponents(self):
         return self._nodes
 
-    def delete(self, component):
+    def delete(self, component, composite):
         try:
             self._nodes.remove(component)
+            composite.delete(component)
             return ("deleted")
         except:
-            return ("can not delete")
+            raise Exception("can not delete")
 
 
 class BinaryFile(object):
 
     __context = ""
     _nodes = []
-    _type = ""
+    type = ""
     name = ""
     path = ""
 
     def __init__(self, type):
-        self._type = type
+        self.type = type
         self._nodes = []
 
     def create(self, name, path, context):
@@ -125,13 +134,13 @@ class BinaryFile(object):
             self.path = newRoot.path+self.name+"/"
             return (self.path)
         else:
-            return ("can not move")
+            raise Exception("can not move")
 
     def getListOfComponents(self):
-        print("operation is not possible")
+        raise Exception("operation is not possible")
 
     def findComponent(self, name):
-        print("operation is not possible")
+        raise Exception("operation is not possible")
 
     def readFile(self):
         return self.__context
@@ -142,12 +151,12 @@ class LogTextFile(object):
     __context = []
 
     _nodes = []
-    _type = ""
+    type = ""
     name = ""
     path = ""
 
     def __init__(self, type):
-        self._type = type
+        self.type = type
         self._nodes = []
 
     def create(self, name, path, context):
@@ -168,13 +177,13 @@ class LogTextFile(object):
             self.path = newRoot.path+self.name+"/"
             return (self.path)
         else:
-            return ("can not move")
+            raise Exception("can not move")
 
     def getListOfComponents(self):
-        print("operation is not possible")
+        raise Exception("operation is not possible")
 
     def findComponent(self, name):
-        print("operation is not possible")
+        raise Exception("operation is not possible")
 
     def readFile(self):
         contextOfFile = ""
@@ -192,13 +201,13 @@ class BufferFile(object):
     __context = []
 
     _nodes = []
-    _type = ""
+    type = ""
     name = ""
     path = ""
     max_num = 5
 
     def __init__(self, type):
-        self._type = type
+        self.type = type
         self._nodes = []
 
     def create(self, name, path):
@@ -218,13 +227,13 @@ class BufferFile(object):
             self.path = newRoot.path+self.name+"/"
             return (self.path)
         else:
-            return ("can not move")
+            raise Exception("can not move")
 
     def getListOfComponents(self):
-        print("operation is not possible")
+        raise Exception("operation is not possible")
 
     def findComponent(self, name):
-        print("operation is not possible")
+        raise Exception("operation is not possible")
 
     def readFile(self):
         contextOfFile = ""

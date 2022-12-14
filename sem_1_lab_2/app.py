@@ -232,6 +232,107 @@ def consumeBuffer():
         return "Can not consume from buffer file", 400
 
 
+@app.route('/deletedir' , methods=['DELETE'])
+def deletedir():
+    try:
+        content = request.json
+        path=content['path']
+        parts= path.split("/")
+        component=composite.findComponent(parts[len(parts)-2])
+        if(parts[len(parts)-3]==""):
+            if(component.path == path):
+                composite.removeFileSystemComponent(component) 
+                return "Deleted"
+            else:
+                raise Exception("cannot find dir to delete")
+            
+        else:
+            root=composite.findComponent(parts[len(parts)-3]) 
+            if(component.path == path):
+                root.delete(component, composite)
+                return "Deleted from: %s" % root.path
+            else:
+                raise Exception("cannot find dir to delete")
+    except:
+        return "Can not delete", 400
+
+@app.route('/deletebinary' , methods=['DELETE'])
+def deleteBinary():
+    try:
+        content = request.json
+        path=content['path']
+        parts= path.split("/")
+        component=composite.findComponent(parts[len(parts)-2]) 
+        if(parts[len(parts)-3]==""):
+            if(component.path == path):
+                composite.removeFileSystemComponent(component) 
+                return "Deleted "
+            else:
+                raise Exception("cannot find binary file to delete")
+            
+        else:
+            root=composite.findComponent(parts[len(parts)-3]) 
+            if(component.path == path):
+                root.delete(component, composite)
+                return "Deleted from: %s" % root.path
+            else:
+                raise Exception("cannot find binary file to delete")
+    except:
+        return "Can not delete", 400
+
+@app.route('/deletelog' , methods=['DELETE'])
+def deleteLog():
+    try:
+        content = request.json
+        path=content['path']
+        parts= path.split("/")
+        component=composite.findComponent(parts[len(parts)-2]) 
+        if(parts[len(parts)-3]==""):
+            if(component.path == path):
+                composite.removeFileSystemComponent(component) 
+                return "Deleted "
+            else:
+                raise Exception("cannot find log text file to delete")
+            
+        else:
+            root=composite.findComponent(parts[len(parts)-3]) 
+            if(component.path == path):
+                root.delete(component, composite)
+                return "Deleted from: %s" % root.path
+            else:
+                raise Exception("cannot find log text file to delete")
+    except:
+        return "Can not delete", 400
+
+
+
+@app.route('/deletebuffer' , methods=['DELETE'])
+def deleteBuffer():
+    try:
+        content = request.json
+        path=content['path']
+        parts= path.split("/")
+        component=composite.findComponent(parts[len(parts)-2]) 
+        if(parts[len(parts)-3]==""):
+            if(component.path == path):
+                composite.removeFileSystemComponent(component) 
+                return "Deleted "
+            else:
+                raise Exception("cannot find buffer file to delete")
+            
+        else:
+            root=composite.findComponent(parts[len(parts)-3]) 
+            if(component.path == path):
+                root.delete(component, composite)
+                return "Deleted from: %s" % root.path
+            else:
+                raise Exception("cannot find buffer file to delete")
+    except:
+        return "Can not delete", 400
+
+
+
+
 if __name__ == '__main__':
     app.run(debug=True)
 
