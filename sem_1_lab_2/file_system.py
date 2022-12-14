@@ -224,10 +224,11 @@ class BufferFile(object):
             # component = composite.findComponent(self.name)
             newRoot.addSystemComponent(self)
             root.delete(self)
+            print(newRoot.path)
             self.path = newRoot.path+self.name+"/"
             return (self.path)
         else:
-            raise Exception("can not move")
+            return ("can not move")
 
     def getListOfComponents(self):
         raise Exception("operation is not possible")
@@ -243,7 +244,7 @@ class BufferFile(object):
 
     def push(self, newLine):
         if (len(self.__context) >= self.max_num):
-            return ("can not add new data")
+            raise ("can not add new data")
 
         self.__context.append(newLine)
         return len(self.__context)
@@ -254,7 +255,7 @@ class BufferFile(object):
             self.__context.pop(0)
             return consumeEl
         except:
-            return "buffer file is empty"
+            return Exception("buffer file is empty") , 204
 
 
 

@@ -14,9 +14,9 @@ def createDir():
         dir=Directory("dir")
         dir.create(content['name'], content['path'])
         composite.addSystemComponent(dir)
-        return "Created: %s" % dir.path
+        return "Created directory: %s" % dir.path , 201
     except:
-        return "Can not create", 400
+        return "Can not create directory", 400
 
 
 @app.route('/createbinary', methods=['POST'])
@@ -26,9 +26,9 @@ def createBinary():
         binary=BinaryFile("binary")
         binary.create(content['name'], content['path'], content['context'])
         composite.addSystemComponent(binary)
-        return "Created: %s" % binary.path
+        return "Created binary file: %s" % binary.path, 201
     except:
-        return "Can not create", 400
+        return "Can not create binary file", 400
 
 
 @app.route('/createlog', methods=['POST'])
@@ -38,9 +38,9 @@ def createLog():
         log=LogTextFile("log")
         log.create(content['name'], content['path'], content['context'])
         composite.addSystemComponent(log)
-        return "Created: %s" % log.path
+        return "Created log file: %s" % log.path, 201
     except:
-        return "Can not create", 400
+        return "Can not create log text file", 400
 
 
 @app.route('/createbuffer', methods=['POST'])
@@ -50,12 +50,12 @@ def createBuffer():
         buffer=BufferFile("buff")
         buffer.create(content['name'], content['path'])
         composite.addSystemComponent(buffer)
-        return "Created: %s" % buffer.path
+        return "Created buffer file: %s" % buffer.path, 201
     except:
-        return "Can not create", 400
+        return "Can not create buffer file", 400
 
 
-@app.route('/movedir' , methods=['PUT'])
+@app.route('/moveNode' , methods=['PUT'])
 def movesubdir():
     try:
         content = request.json
@@ -66,66 +66,12 @@ def movesubdir():
         old_root=composite.findComponent(old_parts[len(old_parts)-3]) 
         if(component.path == old_path):
             path= old_root.move(new_path,component,composite)
-            return "Moved: %s" % path
+            return "Moved: %s" % path, 200
         else:
-            raise Exception("cannot find dir to move")
+            return "cannot find dir or file to move", 404
     except:
         return "Can not move", 400
 
-
-@app.route('/movebinary' , methods=['PUT'])
-def movebinary():
-    try:
-        content = request.json
-        old_path=content['old']
-        new_path=content['new']
-        old_parts= old_path.split("/")
-        component=composite.findComponent(old_parts[len(old_parts)-2]) 
-        old_root=composite.findComponent(old_parts[len(old_parts)-3]) 
-        if(component.path == old_path):
-            path= component.move(new_path,composite, old_root)
-            return "Moved: %s" % path
-        else:
-            raise Exception("cannot binary file to move")
-    except:
-        return "Can not move", 400
-
-
-
-@app.route('/movelog' , methods=['PUT'])
-def movelog():
-    try:
-        content = request.json
-        old_path=content['old']
-        new_path=content['new']
-        old_parts= old_path.split("/")
-        component=composite.findComponent(old_parts[len(old_parts)-2]) 
-        old_root=composite.findComponent(old_parts[len(old_parts)-3]) 
-        if(component.path == old_path):
-            path= component.move(new_path,composite, old_root)
-            return "Moved: %s" % path
-        else:
-            raise Exception("cannot find log text file to move")
-    except:
-        return "Can not move", 400
-
-
-@app.route('/movebuffer' , methods=['PUT'])
-def movebuffer():
-    try:
-        content = request.json
-        old_path=content['old']
-        new_path=content['new']
-        old_parts= old_path.split("/")
-        component=composite.findComponent(old_parts[len(old_parts)-2]) 
-        old_root=composite.findComponent(old_parts[len(old_parts)-3]) 
-        if(component.path == old_path):
-            path= component.move(new_path,composite, old_root)
-            return "Moved: %s" % path
-        else:
-            raise Exception("cannot find buffer file to move")
-    except:
-        return "Can not move", 400
 
 
 @app.route('/getlist' , methods=['GET'])
@@ -140,9 +86,9 @@ def getListOfDir():
             string_list=""
             for file in list:
                 string_list+=file.name+", "
-            return string_list
+            return string_list, 200
         else:
-            raise Exception("cannot find directory")
+            return("cannot find directory"), 404
     except:
         return "Can not get list of directory` components", 400
 
@@ -157,9 +103,9 @@ def readBinary():
         component=composite.findComponent(old_parts[len(old_parts)-2])  
         if(component.path == path):
             context = component.readFile()
-            return context
+            return context, 200
         else:
-            raise Exception("cannot find binary file")
+            return("cannot find binary file"), 404
     except:
         return "Can not read binary file", 400
 
@@ -175,9 +121,9 @@ def readLog():
         component=composite.findComponent(old_parts[len(old_parts)-2])  
         if(component.path == path):
             context = component.readFile()
-            return context
+            return context, 200
         else:
-            raise Exception("cannot find log file")
+            return ("cannot find log file"), 404
     except:
         return "Can not read log file", 400
 
@@ -192,9 +138,9 @@ def appendLog():
         line=content['line']
         if(component.path == path):
             context_len = component.addLine(line)
-            return str(context_len)
+            return str(context_len), 200
         else:
-            raise Exception("cannot find log file")
+            return("cannot find log file"), 404
     except:
         return "Can not add line to log file", 400
 
@@ -211,7 +157,7 @@ def pushBuffer():
             context_len = component.push(push_line)
             return str(context_len)
         else:
-            raise Exception("cannot find buffer file")
+            return("cannot find buffer file"), 404
     except:
         return "Can not push to buffer file", 400
 
@@ -227,7 +173,7 @@ def consumeBuffer():
             consume_el= component.consume()
             return consume_el
         else:
-            raise Exception("cannot find buffer file")
+            return("cannot find buffer file"), 404
     except:
         return "Can not consume from buffer file", 400
 
@@ -242,19 +188,20 @@ def deletedir():
         if(parts[len(parts)-3]==""):
             if(component.path == path):
                 composite.removeFileSystemComponent(component) 
-                return "Deleted"
+                return "Deleted", 200
             else:
-                raise Exception("cannot find dir to delete")
+                return("cannot find dir to delete"), 404
             
         else:
             root=composite.findComponent(parts[len(parts)-3]) 
             if(component.path == path):
                 root.delete(component, composite)
-                return "Deleted from: %s" % root.path
+                return "Deleted from: %s" % root.path , 200
             else:
-                raise Exception("cannot find dir to delete")
+                return("cannot find dir to delete"), 404
     except:
         return "Can not delete", 400
+
 
 @app.route('/deletebinary' , methods=['DELETE'])
 def deleteBinary():
@@ -266,17 +213,17 @@ def deleteBinary():
         if(parts[len(parts)-3]==""):
             if(component.path == path):
                 composite.removeFileSystemComponent(component) 
-                return "Deleted "
+                return "Deleted ", 200
             else:
-                raise Exception("cannot find binary file to delete")
+                return("cannot find binary file to delete"), 404
             
         else:
             root=composite.findComponent(parts[len(parts)-3]) 
             if(component.path == path):
                 root.delete(component, composite)
-                return "Deleted from: %s" % root.path
+                return "Deleted from: %s" % root.path, 200
             else:
-                raise Exception("cannot find binary file to delete")
+                return("cannot find binary file to delete"), 404
     except:
         return "Can not delete", 400
 
@@ -290,17 +237,17 @@ def deleteLog():
         if(parts[len(parts)-3]==""):
             if(component.path == path):
                 composite.removeFileSystemComponent(component) 
-                return "Deleted "
+                return "Deleted ", 200
             else:
-                raise Exception("cannot find log text file to delete")
+                return("cannot find log text file to delete"), 404
             
         else:
             root=composite.findComponent(parts[len(parts)-3]) 
             if(component.path == path):
                 root.delete(component, composite)
-                return "Deleted from: %s" % root.path
+                return "Deleted from: %s" % root.path, 200
             else:
-                raise Exception("cannot find log text file to delete")
+                return("cannot find log text file to delete"), 404
     except:
         return "Can not delete", 400
 
@@ -316,23 +263,22 @@ def deleteBuffer():
         if(parts[len(parts)-3]==""):
             if(component.path == path):
                 composite.removeFileSystemComponent(component) 
-                return "Deleted "
+                return "Deleted ", 200
             else:
-                raise Exception("cannot find buffer file to delete")
+                return("cannot find buffer file to delete"), 404
             
         else:
             root=composite.findComponent(parts[len(parts)-3]) 
             if(component.path == path):
                 root.delete(component, composite)
-                return "Deleted from: %s" % root.path
+                return "Deleted from: %s" % root.path, 200
             else:
-                raise Exception("cannot find buffer file to delete")
+                return("cannot find buffer file to delete"), 404
     except:
         return "Can not delete", 400
 
 
 
 
-if __name__ == '__main__':
-    app.run(debug=True)
+
 
